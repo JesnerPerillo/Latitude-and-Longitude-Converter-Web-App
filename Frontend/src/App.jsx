@@ -12,7 +12,7 @@ function App() {
     const min = Math.floor((Math.abs(dd) - deg) * 60);
     const sec = ((Math.abs(dd) - deg - min / 60) * 3600).toFixed(2);
     const direction = dd < 0 ? (type === "lat" ? "S" : "W") : type === "lat" ? "N" : "E";
-    return`${deg}° ${min} ${sec} ${direction}`;
+    return`${deg}° ${min}' ${sec}" ${direction}`;
   }
 
   const handleConvertDMS = (e) => {
@@ -22,7 +22,7 @@ function App() {
   
   const handleSaveCoords = async (e) => {
     e.preventDefault();
-    await fetch("http://localhost:5000/coords", {
+    await fetch("http://localhost:5000/api/coords", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
