@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 function App() {
   const [lat, setLat] = useState(0);
-  const [long, setLong] = useState(0);
+  const [lng, setLng] = useState(0);
   const [dms, setDms] = useState("");
 
   const convertDMS = (dd, type) => {
@@ -17,40 +17,73 @@ function App() {
 
   const handleConvertDMS = (e) => {
     e.preventDefault();
-    setDms(`${convertDMS(lat, "lat")}, ${convertDMS(long, "long")}`);
+    setDms(`${convertDMS(lat, "lat")}, ${convertDMS(lng, "long")}`);
   };
   
   const handleSaveCoords = async (e) => {
     e.preventDefault();
-    await fetch("http://localhost:5000/api/coords", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ lat, long, notes: "Converted coordinates" }),
-    });
-    alert("Coordinates saved successfully!");
+    try {
+      const response = await fetch("http://localhost:5000/coords", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ lat, lng, notes: "Converted coordinates" }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json(); // Try to get error details
+        throw new Error(errorData.error || 'Failed to save coordinates');
+      }
+      
+      const data = await response.json();
+      alert(data.message || "Coordinates saved successfully!");
+    } catch (error) {
+      console.error("Error saving coordinates:", error.message);
+      alert(`Failed to save coordinates: ${error.message}`);
+    }
   };
   
 
   return (
     <div className="bg-gray-200 h-screen w-full flex justify-center items-center">
-      <div className="w-full max-w-md bg-white shadow-md rounded-lg p-6">
-        <form className="space-y-4 flex flex-col items-center">
+      <div className="w-full max-w-md bg-white shadow-lg rounded-xl p-6 space-y-4">
+        <h2 className="text-3xl font-semibold text-center text-gray-800 mb-15">Coordinate Converter</h2>
+        <form className="flex flex-col gap-4">
           <div className="flex flex-col">
-            <label>Latitude</label>
-            <input type="text" value={lat} onChange={(e) => setLat(e.target.value)} placeholder="Enter Decimal Degrees" />
+            <label className="text-gray-700 font-medium">Latitude</label>
+            <input 
+              type="text" 
+              value={lat} 
+              onChange={(e) => setLat(e.target.value)} 
+              placeholder="Enter Decimal Degrees"
+              className="border-b-2 outline-none p-2"
+            />
           </div>
           <div className="flex flex-col">
-            <label>Longitude</label>
-            <input type="text" value={long} onChange={(e) => setLong(e.target.value)} placeholder="Enter Decimal Degrees" />
+            <label className="text-gray-700 font-medium">Longitude</label>
+            <input 
+              type="text" 
+              value={lng} 
+              onChange={(e) => setLng(e.target.value)} 
+              placeholder="Enter Decimal Degrees"
+              className="border-b-2 outline-none p-2"
+            />
           </div>
-          <div>
-            <label>DMS</label>
-            <p>{dms}</p>
+          <div className="bg-gray-100 p-3 rounded-lg text-center text-gray-800 font-semibold">
+            <label className="text-gray-700 font-medium">DMS</label>
+            <p className="text-lg">{dms || "Converted coordinates will appear here"}</p>
           </div>
-          <button onClick={handleConvertDMS}>Convert Coords</button>
-          <button onClick={handleSaveCoords}>Save Converted Coords</button>
+          <div className="flex justify-center">
+            <button onClick={handleConvertDMS} className="w-1/2 bg-gray-600 text-white py-2 rounded-lg hover:bg-gray-700 transition duration-300 hover:cursor-pointer">
+              Convert Coordinates
+            </button>
+          </div>
+          <div className="flex justify-center">
+            <button onClick={handleSaveCoords} className="w-1/2 bg-green-500 text-white py-2 rounded-lg hover:bg-green-500 transition duration-300 hover:cursor-pointer">
+              Save Converted Coords
+            </button>
+          </div>
         </form>
       </div>
     </div>
