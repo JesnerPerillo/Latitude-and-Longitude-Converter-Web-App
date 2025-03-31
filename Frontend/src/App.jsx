@@ -23,24 +23,31 @@ function App() {
   const handleSaveCoords = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:5000/coords", {
+      const response = await fetch("http://localhost:5000/api/coords", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({ lat, lng, notes: "Converted coordinates" }),
       });
-      
+  
+      const text = await response.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        console.error("Received non-JSON response:", text);
+        throw new Error(`Server returned: ${text.substring(0, 100)}...`);
+      }
+  
       if (!response.ok) {
-        const errorData = await response.json(); // Try to get error details
-        throw new Error(errorData.error || 'Failed to save coordinates');
+        throw new Error(data.error || 'Failed to save coordinates');
       }
       
-      const data = await response.json();
       alert(data.message || "Coordinates saved successfully!");
     } catch (error) {
-      console.error("Error saving coordinates:", error.message);
-      alert(`Failed to save coordinates: ${error.message}`);
+      console.error("Full error:", error);
+      alert(`Error: ${error.message}`);
     }
   };
   
