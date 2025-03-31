@@ -80,7 +80,7 @@ function App() {
             </button>
           </div>
           <div className="flex justify-center">
-            <button onClick={handleSaveCoords} className="w-1/2 bg-green-500 text-white py-2 rounded-lg hover:bg-green-500 transition duration-300 hover:cursor-pointer">
+            <button onClick={handleSaveCoords} className="w-1/2 bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition duration-300 hover:cursor-pointer">
               Save Converted Coords
             </button>
           </div>
